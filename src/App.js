@@ -1,22 +1,43 @@
 import "./App.css";
 import { useState } from "react";
 
+const TodoCell = ({ handleChange, e, children }) => {
+  return (
+    <div className="todo-item" key={e.work}>
+      <div className="checker">
+        <span className="">
+          <input
+            type="checkbox"
+            defaultChecked={e.status}
+            onChange={() => handleChange(e)}
+          />
+        </span>
+      </div>
+      {children}
+    </div>
+  );
+};
 function App() {
   let [task, setTask] = useState();
+  const [activeFilter, setFilter] = useState("all");
   let [todo, setTodo] = useState([
     {
+      id: 1,
       work: "Create Theme",
       status: false,
     },
     {
+      id: 2,
       work: "work on Wordpress",
       status: false,
     },
     {
+      id: 3,
       work: "Organize office main department",
       status: false,
     },
     {
+      id: 4,
       work: "Error solve in HTML template",
       status: false,
     },
@@ -27,20 +48,20 @@ function App() {
     item.status = !item.status;
     update.splice(update.indexOf(e), 1, item);
     setTodo(update);
-    //console.log(todo);
+    console.log(update);
   };
   let add = () => {
     if (task) {
       let newArr = [...todo];
       newArr.push({
+        id: todo.length,
         work: task,
-        status: false
+        status: false,
+      });
 
-      })
-
-      setTodo(console.log(newArr))
+      setTodo(newArr);
     }
-  }
+  };
 
   return (
     <div>
@@ -49,49 +70,84 @@ function App() {
           <div className="col-md-12">
             <div className="card card-white">
               <div className="card-body">
-                <form action="">
+                <form>
                   <input
                     type="text"
                     className="form-control add-task"
                     placeholder="New Task..."
-                    onChange={(e) => { setTask(e.target.value) }}
-
+                    onChange={(e) => {
+                      setTask(e.target.value);
+                    }}
                   />
-                  <button className="btn btn-primary" onClick={() => add()} >Create</button>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={() => add()}
+                  >
+                    Create
+                  </button>
                 </form>
                 <ul className="nav nav-pills todo-nav">
                   <li role="presentation" className="nav-item all-task active">
-                    <a href="http" className="nav-link">
+                    <span
+                      className={[
+                        "nav-link cursor-pointer",
+                        activeFilter === "all" ? "active-filter" : "",
+                      ].join(" ")}
+                      onClick={() => setFilter("all")}
+                    >
                       All
-                    </a>
+                    </span>
                   </li>
                   <li role="presentation" className="nav-item active-task">
-                    <a href="http" className="nav-link">
+                    <span
+                      className={[
+                        "nav-link cursor-pointer",
+                        activeFilter === "active" ? "active-filter" : "",
+                      ].join(" ")}
+                      onClick={() => setFilter("active")}
+                    >
                       Active
-                    </a>
+                    </span>
                   </li>
                   <li role="presentation" className="nav-item completed-task">
-                    <a href="http" className="nav-link">
+                    <span
+                      className={[
+                        "nav-link cursor-pointer",
+                        activeFilter === "completed" ? "active-filter" : "",
+                      ].join(" ")}
+                      onClick={() => setFilter("completed")}
+                    >
                       Completed
-                    </a>
+                    </span>
                   </li>
                 </ul>
                 <div className="todo-list">
-                  {todo.map((e, index) => {
-                    return (
-                      <div className="todo-item" key={index}>
-                        <div className="checker" >
-                          <span className="">
-                            <input
-
-                              type="checkbox"
-                              defaultChecked={e.status}
-                              onChange={() => handleChange(e)}
-                            />
-                          </span>
-                        </div>
-                        {e.status ? (<span><s>{e.work}</s> </span>) : (<span>{e.work}</span>)}
-                      </div>
+                  {todo.map((e) => {
+                    return activeFilter === "active" && !e.status ? (
+                      <TodoCell handleChange={handleChange} e={e} key={e.work}>
+                        <span>{e.work}</span>
+                      </TodoCell>
+                    ) : activeFilter === "completed" && e.status ? (
+                      <TodoCell handleChange={handleChange} e={e} key={e.work}>
+                        <s>
+                          {" "}
+                          <span>{e.work}</span>
+                        </s>
+                      </TodoCell>
+                    ) : activeFilter === "all" ? (
+                      <TodoCell handleChange={handleChange} e={e} key={e.work}>
+                        {e.status ? (
+                          <s>
+                            {" "}
+                            <span>{e.work}</span>
+                          </s>
+                        ) : (
+                          <span>{e.work}</span>
+                        )}
+                      </TodoCell>
+                    ) : (
+                      ""
                     );
                   })}
                 </div>
